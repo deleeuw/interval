@@ -1,0 +1,115 @@
+---
+title: "Interval MDS"
+author: 
+- Jan de Leeuw - University of California Los Angeles
+date: '`r paste("Started November 24 2023, Version of",format(Sys.Date(),"%B %d, %Y"))`'
+output:
+  bookdown::pdf_document2:
+    latex_engine: lualatex 
+    includes:
+      in_header: preamble.tex
+    keep_tex: yes
+    number_sections: yes
+  bookdown::html_document2:
+    keep_md: yes
+    css: preamble.css
+    number_sections: yes
+graphics: yes
+mainfont: Times New Roman
+fontsize: 12pt
+bibliography: ["mypubs.bib","total.bib"]
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+# Problem
+
+In the transformation phase of interval MDS we want to minimize
+\begin{equation}
+\sigma(\alpha,\beta):=\sum_{k=1}^Kw_k(\alpha\delta_k+\beta-d_k)^2
+(\#eq:loss)
+\end{equation}
+over the inequality constraints $\alpha\geq 0$ and
+$\alpha\delta_k+\beta\geq 0$ and the normalization constraint
+\begin{equation}
+\sum_{k=1}^Kw_k(\alpha\delta_k+\beta)^2=1.
+\end{equation}
+The $w_k$ in definition \@ref(eq:loss) are non-negative weights. We
+assume, without loss of generality, that they add up to one.
+
+The theory of normalized cone regression (@deleeuw_U_75a,
+@bauschke_bui_wang_18, @deleeuw_E_19d) shows that we can ignore the
+normalization constraint and impose only the inequality constraints. We
+find the solution to the normalized problem by normalizing the solution
+of the unnormalized problem.
+
+The inequality constraints are obviously equivalent to $\alpha\geq 0$
+and $\alpha\delta_{\text{min}}+\beta\geq 0$, with $\delta_{\text{min}}$
+the smallest of the $\delta_k$. If
+$\gamma:=\alpha\delta_{\text{min}}+\beta$, and
+$e_k:=\delta_k-\delta_{\text{min}}$ then \begin{equation}
+\sigma(\alpha,\beta)=\sum_{k=1}^Kw_k(\alpha\delta_k+\beta-d_k)^2=\sum_{k=1}^Kw_k(\alpha e_k+\gamma-d_k)^2:=\sigma(\alpha,\gamma),
+\end{equation} and we minimize $\sigma$ over $\alpha\geq 0$ and
+$\gamma\geq 0$, i.e. over the non-negative orthant. Note that
+$e_k\geq 0$ for all $k$.
+
+# Equations
+
+We start with the trivial observation that the minimum of any function
+over the non-negative orthant in two-dimensional space is attained
+either in the interior, i.e. the positive orthant, or on one of the two
+rays emanating from the origin along the axes, or at the intersection of
+these rays, i.e. the origin.
+
+Now, in a more compact notation, 
+\begin{equation}
+\sigma(\alpha,\gamma)=\alpha^2[e^2]+\gamma^2+[d^2]+2\alpha\gamma[e]-2\alpha[ed]-2\gamma[d],
+\end{equation} 
+where the square brackets indicate weighted means. We also assume that the MDS problem is 
+non-trivial, by which we mean in this context that
+both $[e]$ and $[d]$ are positive.
+
+If the minimum is attained in the interior then the gradient
+must vanish at the minimum. Suppose not all $e_k$ are equal to zero
+(i.e. not all $\delta_k$ are equal). The gradient vanishes at
+\begin{align}
+\alpha_0&=\frac{[ed]-[e][d]}{[e^2]-[e]^2},\\
+\gamma_0&=[d]-\alpha_0[e].
+\end{align} 
+If $\alpha_0\geq 0$ and $\gamma_0\geq 0$ we are done. We
+have found the required minimum at $\alpha_0$ and
+$\beta_0=\gamma_0-\alpha_0\delta_{\text{min}}$.
+
+If $(\alpha_0,\gamma_0)$ is not in the non-negative orthant, the minimum
+either occurs on the line $\alpha=0$ or on the line $\gamma=0$, or at
+their intersection (the origin).
+
+The minimum on the line $\alpha=0$ occurs at $\gamma_1=[d]$ and is equal
+to \begin{equation}
+\sigma_1=\sigma(0,\gamma_1)=[d^2]-[d]^2.
+\end{equation} Since $[d]$ is positive in MDS the point $(\alpha_1=0,\gamma_1)$
+is in the non-negative orthant, and thus always feasible. Also
+$\beta_1=\gamma_1$ and thus $\alpha_1\delta_k+\beta_1=[d]$.
+
+The minimum on the line $\gamma=0$ occurs at \begin{equation}
+\alpha_2=\frac{[ed]}{[e^2]},
+\end{equation} and is equal to \begin{equation}
+\sigma_2:=\sigma(\alpha_2,0)=[d^2]-\frac{[ed]^2}{[e^2]}.
+\end{equation}
+Again $\alpha_2\geq 0$ and thus $(\alpha_2,\gamma_2=0$ is always feasible.
+Also $\gamma_2=0$ means that $\beta_2=-\alpha_2\delta_{\text{min}}$
+and $\alpha_2\delta_k+\beta_2=\alpha_2e_k$.
+
+Thus, summarizing, if $(\alpha_0,\gamma_0)$ is not feasible then the
+minimum is at $(\alpha_1,\beta_1)$ if $\sigma_1<\sigma_2$ and at
+$(\alpha_2,\beta_2)$ if $\sigma_2<\sigma_1$. There is C code (for the
+unweighted case of the smacof project) in the appendix.
+
+# Appendix: Code
+
+```{c file_auxilary, code = readLines("interval.c"), eval = FALSE}
+```
+
+
+# References
